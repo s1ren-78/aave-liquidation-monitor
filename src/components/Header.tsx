@@ -8,24 +8,24 @@ interface HeaderProps {
 
 export default function Header({ lastUpdated, onRefresh, isRefreshing }: HeaderProps) {
   return (
-    <header className="bg-gradient-to-r from-aave-purple to-aave-blue p-6 text-white">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="bg-white border-b border-[var(--notion-border)]">
+      <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">AAVE V3 Liquidation Monitor</h1>
-          <p className="text-sm opacity-80 mt-1">
-            Real-time monitoring of lending positions on Ethereum Mainnet
+          <h1 className="text-xl font-semibold text-[var(--notion-text)]">Aave Monitor</h1>
+          <p className="text-sm text-[var(--notion-muted)] mt-1">
+            Real-time lending position overview on Ethereum
           </p>
         </div>
         <div className="flex items-center gap-4">
           {lastUpdated && (
-            <span className="text-sm opacity-80">
-              Last updated: {lastUpdated.toLocaleTimeString()}
+            <span className="text-sm text-[var(--notion-muted)]">
+              Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
           <button
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-3.5 py-2 border border-[var(--notion-border)] bg-white text-[var(--notion-text)] rounded-md hover:bg-[#f3f2ef] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
           >
             <svg
               className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}

@@ -18,11 +18,11 @@ export default function TransactionList({ selectedAddress }: TransactionListProp
 
   if (!selectedAddress) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+        <h2 className="text-base font-semibold text-[var(--notion-text)] mb-3">
           Recent Transactions
         </h2>
-        <p className="text-gray-500 text-center py-8">
+        <p className="text-[var(--notion-muted)] text-center py-8 text-sm">
           Select an address to view its recent transactions
         </p>
       </div>
@@ -30,9 +30,9 @@ export default function TransactionList({ selectedAddress }: TransactionListProp
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
+    <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">
+        <h2 className="text-base font-semibold text-[var(--notion-text)]">
           Recent Transactions
         </h2>
         <div className="flex items-center gap-2">
@@ -40,16 +40,16 @@ export default function TransactionList({ selectedAddress }: TransactionListProp
             href={getEtherscanAddressUrl(selectedAddress)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-aave-purple hover:underline"
+            className="text-sm text-[var(--notion-text)] hover:underline"
           >
             Etherscan
           </a>
-          <span className="text-gray-300">|</span>
+          <span className="text-[var(--notion-border)]">|</span>
           <a
             href={getDeBankUrl(selectedAddress)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-aave-blue hover:underline"
+            className="text-sm text-[var(--notion-text)] hover:underline"
           >
             DeBank
           </a>
@@ -57,11 +57,15 @@ export default function TransactionList({ selectedAddress }: TransactionListProp
       </div>
 
       {error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-600">{error}</p>
       ) : loading ? (
-        <div className="text-center py-8 text-gray-500">Loading transactions...</div>
+        <div className="text-center py-8 text-[var(--notion-muted)] text-sm">
+          Loading transactions...
+        </div>
       ) : transactions.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">No transactions found</p>
+        <p className="text-[var(--notion-muted)] text-center py-8 text-sm">
+          No transactions found
+        </p>
       ) : (
         <div className="space-y-3">
           {transactions.map((tx) => (
@@ -87,13 +91,13 @@ function TransactionItem({
       href={getEtherscanTxUrl(transaction.hash)}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+      className="block p-3 rounded-md border border-[var(--notion-border)] hover:bg-[#f7f6f3] transition-colors"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              isOutgoing ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
+            className={`w-8 h-8 rounded-md border border-[var(--notion-border)] flex items-center justify-center ${
+              isOutgoing ? 'bg-[#f9ecec] text-[#a33a3a]' : 'bg-[#edf5ef] text-[#2e6b42]'
             }`}
           >
             {isOutgoing ? (
@@ -118,26 +122,26 @@ function TransactionItem({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-[var(--notion-text)]">
                 {transaction.functionName || (isOutgoing ? 'Sent' : 'Received')}
               </span>
               {transaction.isError && (
-                <span className="px-2 py-0.5 text-xs bg-red-100 text-red-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs bg-[#f9ecec] text-[#a33a3a] rounded-full">
                   Failed
                 </span>
               )}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-[var(--notion-muted)]">
               {isOutgoing ? 'To: ' : 'From: '}
               {formatAddress(isOutgoing ? transaction.to : transaction.from, 6)}
             </div>
           </div>
         </div>
         <div className="text-right">
-          <div className="font-medium text-gray-900">
+          <div className="font-medium text-[var(--notion-text)]">
             {formatEthValue(transaction.value)}
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-[var(--notion-muted)]">
             {formatRelativeTime(transaction.timestamp)}
           </div>
         </div>

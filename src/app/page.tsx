@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import AddressInput from '@/components/AddressInput';
+import PriceDisplay from '@/components/PriceDisplay';
 import PositionTable from '@/components/PositionTable';
 import LiquidationChart from '@/components/LiquidationChart';
 import TransactionList from '@/components/TransactionList';
@@ -83,15 +84,29 @@ export default function Home() {
         isRefreshing={isRefreshing || priceLoading || positionsLoading}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 gap-6 mb-6">
-          <AddressInput
-            addresses={addresses}
-            onAddAddress={handleAddAddress}
-            onRemoveAddress={handleRemoveAddress}
-            selectedAddress={selectedAddress}
-            onSelectAddress={setSelectedAddress}
-          />
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Left column: Address input */}
+          <div className="lg:col-span-2">
+            <AddressInput
+              addresses={addresses}
+              onAddAddress={handleAddAddress}
+              onRemoveAddress={handleRemoveAddress}
+              selectedAddress={selectedAddress}
+              onSelectAddress={setSelectedAddress}
+            />
+          </div>
+
+          {/* Right column: ETH Price */}
+          <div>
+            <PriceDisplay
+              price={ethPrice}
+              loading={priceLoading}
+              error={priceError}
+              lastUpdated={priceLastUpdated}
+              onRefresh={refetchPrice}
+            />
+          </div>
         </div>
 
         {/* Position Table */}
@@ -113,10 +128,10 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 mt-12 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm">
-            AAVE V3 Liquidation Monitor | Ethereum Mainnet | Data refreshes every 30 seconds
+      <footer className="border-t border-[var(--notion-border)] mt-12 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-[var(--notion-muted)] text-sm">
+            Aave V3 Monitor | Ethereum Mainnet | Refresh every 30 seconds
           </p>
         </div>
       </footer>

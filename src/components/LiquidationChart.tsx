@@ -25,11 +25,11 @@ export default function LiquidationChart({
 }: LiquidationChartProps) {
   if (currentEthPrice === 0 || positions.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+        <h2 className="text-base font-semibold text-[var(--notion-text)] mb-3">
           Liquidation Risk by ETH Price
         </h2>
-        <div className="h-64 flex items-center justify-center text-gray-500">
+        <div className="h-64 flex items-center justify-center text-[var(--notion-muted)] text-sm">
           {currentEthPrice === 0
             ? 'Loading price data...'
             : 'Add addresses to view liquidation risk chart'}
@@ -46,11 +46,11 @@ export default function LiquidationChart({
 
   if (!hasLiquidationData) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+        <h2 className="text-base font-semibold text-[var(--notion-text)] mb-3">
           Liquidation Risk by ETH Price
         </h2>
-        <div className="h-64 flex items-center justify-center text-gray-500">
+        <div className="h-64 flex items-center justify-center text-[var(--notion-muted)] text-sm">
           No positions with liquidation risk in the current price range
         </div>
       </div>
@@ -58,11 +58,11 @@ export default function LiquidationChart({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
+    <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+      <h2 className="text-base font-semibold text-[var(--notion-text)] mb-3">
         Liquidation Risk by ETH Price
       </h2>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-[var(--notion-muted)] mb-4">
         Cumulative collateral value at risk of liquidation as ETH price decreases
       </p>
 
@@ -74,44 +74,44 @@ export default function LiquidationChart({
           >
             <defs>
               <linearGradient id="colorLiquidation" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="#2f3437" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#2f3437" stopOpacity={0.05} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e6e4df" />
             <XAxis
               dataKey="price"
               tickFormatter={(value) => `$${value.toLocaleString()}`}
-              tick={{ fontSize: 12, fill: '#6b7280' }}
+              tick={{ fontSize: 12, fill: '#6b6f73' }}
             />
             <YAxis
               tickFormatter={(value) => formatUSD(value)}
-              tick={{ fontSize: 12, fill: '#6b7280' }}
+              tick={{ fontSize: 12, fill: '#6b6f73' }}
             />
             <Tooltip
               formatter={(value: number) => [formatUSD(value), 'At Risk']}
               labelFormatter={(label) => `ETH Price: $${Number(label).toLocaleString()}`}
               contentStyle={{
                 backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
+                border: '1px solid #e6e4df',
                 borderRadius: '8px',
               }}
             />
             <ReferenceLine
               x={currentEthPrice}
-              stroke="#B6509E"
+              stroke="#2f3437"
               strokeDasharray="5 5"
               label={{
                 value: 'Current',
                 position: 'top',
-                fill: '#B6509E',
+                fill: '#2f3437',
                 fontSize: 12,
               }}
             />
             <Area
               type="stepAfter"
               dataKey="cumulativeLiquidation"
-              stroke="#ef4444"
+              stroke="#2f3437"
               fillOpacity={1}
               fill="url(#colorLiquidation)"
             />
@@ -119,13 +119,13 @@ export default function LiquidationChart({
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 flex items-center gap-4 text-sm text-gray-600">
+      <div className="mt-4 flex items-center gap-4 text-sm text-[var(--notion-muted)]">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded" />
+          <div className="w-3 h-3 bg-[#2f3437] rounded" />
           <span>Cumulative liquidation value</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-0 border-t-2 border-dashed border-aave-purple" />
+          <div className="w-6 h-0 border-t-2 border-dashed border-[#2f3437]" />
           <span>Current ETH price</span>
         </div>
       </div>

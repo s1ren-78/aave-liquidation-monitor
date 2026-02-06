@@ -1,12 +1,7 @@
 'use client';
 
 import { PositionData } from '@/types';
-import {
-  formatAddress,
-  formatUSD,
-  formatHealthFactor,
-  getHealthFactorColor,
-} from '@/utils/format';
+import { formatAddress, formatUSD, formatHealthFactor, getHealthFactorColor } from '@/utils/format';
 import { getEtherscanAddressUrl, getDeBankUrl } from '@/lib/etherscan';
 
 interface PositionTableProps {
@@ -34,19 +29,19 @@ export default function PositionTable({
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Positions</h2>
-        <p className="text-red-500">{error}</p>
+      <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+        <h2 className="text-base font-semibold text-[var(--notion-text)] mb-3">Positions</h2>
+        <p className="text-red-600 text-sm">{error}</p>
       </div>
     );
   }
 
   if (positions.length === 0 && !loading) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Positions</h2>
-        <p className="text-gray-500 text-center py-8">
-          Add addresses above to view their AAVE V3 positions.
+      <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+        <h2 className="text-base font-semibold text-[var(--notion-text)] mb-3">Positions</h2>
+        <p className="text-[var(--notion-muted)] text-center py-6 text-sm">
+          Add addresses above to view their Aave V3 positions.
         </p>
       </div>
     );
@@ -55,7 +50,7 @@ export default function PositionTable({
   return (
     <div className="space-y-6">
       {loading && positions.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-md p-6 text-center text-gray-500">
+        <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6 text-center text-[var(--notion-muted)]">
           Loading positions...
         </div>
       ) : (
@@ -68,73 +63,75 @@ export default function PositionTable({
           return (
             <div
               key={position.address}
-              className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transition-colors ${
+              className={`bg-white rounded-xl border border-[var(--notion-border)] overflow-hidden cursor-pointer transition-colors ${
                 selectedAddress === position.address
-                  ? 'ring-2 ring-aave-purple/40'
-                  : 'hover:shadow-lg'
-              } ${position.isAtRisk ? 'border border-red-200' : 'border border-transparent'}`}
+                  ? 'ring-2 ring-black/10'
+                  : 'hover:bg-[#faf9f7]'
+              } ${position.isAtRisk ? 'border-red-200' : ''}`}
               onClick={() =>
                 onSelectAddress(
                   selectedAddress === position.address ? null : position.address
                 )
               }
             >
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+              <div className="px-6 py-5 border-b border-[var(--notion-border)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-r from-aave-purple to-aave-blue flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-7 h-7 rounded-md bg-[#f0efec] border border-[var(--notion-border)] flex items-center justify-center text-[var(--notion-muted)] text-xs font-semibold">
                     A
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-800">Aave V3</span>
-                      <span className="text-gray-400 text-xs">Ethereum</span>
+                      <span className="font-semibold text-[var(--notion-text)]">Aave V3</span>
+                      <span className="text-[var(--notion-muted)] text-xs">Ethereum</span>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-[var(--notion-muted)] font-mono">
                       {formatAddress(position.address, 6)}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-gray-500">Total Supplied</div>
-                  <div className="text-lg font-semibold text-gray-800">
+                  <div className="text-xs text-[var(--notion-muted)]">Total Supplied</div>
+                  <div className="text-lg font-semibold text-[var(--notion-text)]">
                     {formatUSD(position.totalCollateralUSD)}
                   </div>
                 </div>
               </div>
 
-              <div className="px-6 py-3 bg-gray-50 flex items-center justify-between text-sm">
-                <div className="text-gray-600">Health Rate</div>
+              <div className="px-6 py-3 bg-[#f7f6f3] flex items-center justify-between text-sm">
+                <div className="text-[var(--notion-muted)]">Health Rate</div>
                 <div className={`font-semibold ${getHealthFactorColor(position.healthFactor)}`}>
                   {formatHealthFactor(position.healthFactor)}
                 </div>
               </div>
 
               <div className="px-6 py-4">
-                <div className="text-xs uppercase tracking-wider text-gray-400 mb-2">
+                <div className="text-xs uppercase tracking-wider text-[var(--notion-muted)] mb-2">
                   Supplied
                 </div>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-[var(--notion-border)]">
                   {suppliedAssets.length === 0 ? (
-                    <div className="py-3 text-sm text-gray-400">No supplied assets</div>
+                    <div className="py-3 text-sm text-[var(--notion-muted)]">
+                      No supplied assets
+                    </div>
                   ) : (
                     suppliedAssets.map((asset) => {
                       const amount =
                         asset.priceUSD > 0 ? asset.collateralUSD / asset.priceUSD : 0;
                       return (
                         <div key={`supplied-${asset.symbol}`} className="py-3 flex items-center">
-                          <div className="w-7 h-7 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-semibold">
+                          <div className="w-7 h-7 rounded-md bg-[#f0efec] text-[var(--notion-muted)] border border-[var(--notion-border)] flex items-center justify-center text-xs font-semibold">
                             {asset.symbol.slice(0, 2).toUpperCase()}
                           </div>
                           <div className="ml-3 flex-1">
-                            <div className="text-sm font-medium text-gray-800">
+                            <div className="text-sm font-medium text-[var(--notion-text)]">
                               {asset.symbol}
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm text-gray-700">
+                            <div className="text-sm text-[var(--notion-text)]">
                               {formatTokenAmount(amount)} {asset.symbol}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-[var(--notion-muted)]">
                               {formatUSD(asset.collateralUSD)}
                             </div>
                           </div>
@@ -145,32 +142,34 @@ export default function PositionTable({
                 </div>
               </div>
 
-              <div className="px-6 py-4 border-t border-gray-100">
-                <div className="text-xs uppercase tracking-wider text-gray-400 mb-2">
+              <div className="px-6 py-4 border-t border-[var(--notion-border)]">
+                <div className="text-xs uppercase tracking-wider text-[var(--notion-muted)] mb-2">
                   Borrowed
                 </div>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-[var(--notion-border)]">
                   {borrowedAssets.length === 0 ? (
-                    <div className="py-3 text-sm text-gray-400">No borrowed assets</div>
+                    <div className="py-3 text-sm text-[var(--notion-muted)]">
+                      No borrowed assets
+                    </div>
                   ) : (
                     borrowedAssets.map((asset) => {
                       const amount =
                         asset.priceUSD > 0 ? asset.debtUSD / asset.priceUSD : 0;
                       return (
                         <div key={`borrowed-${asset.symbol}`} className="py-3 flex items-center">
-                          <div className="w-7 h-7 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-semibold">
+                          <div className="w-7 h-7 rounded-md bg-[#f0efec] text-[var(--notion-muted)] border border-[var(--notion-border)] flex items-center justify-center text-xs font-semibold">
                             {asset.symbol.slice(0, 2).toUpperCase()}
                           </div>
                           <div className="ml-3 flex-1">
-                            <div className="text-sm font-medium text-gray-800">
+                            <div className="text-sm font-medium text-[var(--notion-text)]">
                               {asset.symbol}
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm text-gray-700">
+                            <div className="text-sm text-[var(--notion-text)]">
                               {formatTokenAmount(amount)} {asset.symbol}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-[var(--notion-muted)]">
                               {formatUSD(asset.debtUSD)}
                             </div>
                           </div>
@@ -181,8 +180,8 @@ export default function PositionTable({
                 </div>
               </div>
 
-              <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-                <div className="text-xs text-gray-500">
+              <div className="px-6 py-4 border-t border-[var(--notion-border)] flex items-center justify-between">
+                <div className="text-xs text-[var(--notion-muted)]">
                   Total Borrowed: {formatUSD(position.totalDebtUSD)}
                 </div>
                 <div className="flex items-center gap-2">
@@ -191,7 +190,7 @@ export default function PositionTable({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-gray-400 hover:text-aave-purple transition-colors"
+                    className="text-[var(--notion-muted)] hover:text-[var(--notion-text)] transition-colors"
                     title="View on Etherscan"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -203,7 +202,7 @@ export default function PositionTable({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-gray-400 hover:text-aave-blue transition-colors"
+                    className="text-[var(--notion-muted)] hover:text-[var(--notion-text)] transition-colors"
                     title="View on DeBank"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

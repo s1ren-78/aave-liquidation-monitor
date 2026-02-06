@@ -46,8 +46,10 @@ export default function AddressInput({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Monitored Addresses</h2>
+    <div className="bg-white rounded-xl border border-[var(--notion-border)] p-6">
+      <h2 className="text-base font-semibold text-[var(--notion-text)] mb-4">
+        Monitored Addresses
+      </h2>
 
       <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
         <input
@@ -58,20 +60,20 @@ export default function AddressInput({
             setError(null);
           }}
           placeholder="Enter Ethereum address (0x...)"
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aave-purple focus:border-transparent"
+          className="flex-1 px-3 py-2 border border-[var(--notion-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-transparent bg-white text-sm"
         />
         <button
           type="submit"
-          className="px-6 py-2 bg-aave-purple text-white rounded-lg hover:bg-opacity-90 transition-colors"
+          className="px-4 py-2 bg-[var(--notion-text)] text-white rounded-md hover:bg-black transition-colors text-sm"
         >
           Add
         </button>
       </form>
 
-      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+      {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
       {addresses.length === 0 ? (
-        <p className="text-gray-500 text-center py-4">
+        <p className="text-[var(--notion-muted)] text-center py-4 text-sm">
           No addresses added yet. Add an address to start monitoring.
         </p>
       ) : (
@@ -79,47 +81,57 @@ export default function AddressInput({
           {addresses.map((address) => (
             <div
               key={address}
-              className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+              className={`flex items-center justify-between p-3 rounded-md border transition-colors ${
                 selectedAddress === address
-                  ? 'bg-aave-purple/10 border-2 border-aave-purple'
-                  : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                  ? 'bg-[#f3f2ef] border-[var(--notion-text)]'
+                  : 'bg-white hover:bg-[#f7f6f3] border-[var(--notion-border)]'
               }`}
-              onClick={() =>
-                onSelectAddress(selectedAddress === address ? null : address)
-              }
+              onClick={() => onSelectAddress(selectedAddress === address ? null : address)}
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-aave-purple to-aave-blue flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-8 h-8 rounded-md bg-[#f0efec] border border-[var(--notion-border)] flex items-center justify-center text-[var(--notion-muted)] text-xs font-semibold">
                   {address.slice(2, 4).toUpperCase()}
                 </div>
-                <span className="font-mono text-sm">
-                  {formatAddress(address, 6)}
-                </span>
+                <span className="font-mono text-sm">{formatAddress(address, 6)}</span>
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemoveAddress(address);
-                  if (selectedAddress === address) {
-                    onSelectAddress(null);
-                  }
-                }}
-                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectAddress(selectedAddress === address ? null : address);
+                  }}
+                  className="px-2.5 py-1 text-xs border border-[var(--notion-border)] rounded-md hover:bg-[#f3f2ef] text-[var(--notion-text)]"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  {selectedAddress === address ? 'Selected' : 'View'}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveAddress(address);
+                    if (selectedAddress === address) {
+                      onSelectAddress(null);
+                    }
+                  }}
+                  className="p-1 text-[var(--notion-muted)] hover:text-red-600 transition-colors"
+                  aria-label="Remove address"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>

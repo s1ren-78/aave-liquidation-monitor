@@ -9,6 +9,35 @@ export interface AaveUserData {
   healthFactor: bigint;
 }
 
+// Asset category for price correlation
+export type AssetCategory = 'eth-correlated' | 'btc-correlated' | 'stable' | 'other';
+
+// Individual asset position
+export interface AssetPosition {
+  symbol: string;
+  address: string;
+  category: AssetCategory;
+  collateralUSD: number;
+  debtUSD: number;
+  liquidationThreshold: number;
+  priceUSD: number;
+  amount: number;
+}
+
+// Detailed user position with asset breakdown
+export interface DetailedUserPosition {
+  address: string;
+  assets: AssetPosition[];
+  // Aggregated by category
+  ethCorrelatedCollateralUSD: number;
+  btcCorrelatedCollateralUSD: number;
+  stableCollateralUSD: number;
+  otherCollateralUSD: number;
+  // Debt breakdown
+  stableDebtUSD: number;
+  nonStableDebtUSD: number;
+}
+
 // Formatted position data for display
 export interface PositionData {
   address: string;
@@ -19,6 +48,14 @@ export interface PositionData {
   ltv: number;
   estimatedLiquidationPrice: number | null;
   isAtRisk: boolean;
+  // New fields for detailed breakdown
+  ethCorrelatedCollateralUSD?: number;
+  ethCorrelatedDebtUSD?: number;
+  nonEthDebtUSD?: number;
+  ethWeightedCollateralUSD?: number;
+  nonEthWeightedCollateralUSD?: number;
+  stableCollateralUSD?: number;
+  assets?: AssetPosition[];
 }
 
 // ETH price data

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getMultipleUsersAccountData } from '@/lib/aave';
+import { getMultipleUsersAccountData, getMultipleDetailedPositions } from '@/lib/aave';
 import { formatAaveUserData } from '@/utils/calculations';
 import { PositionData } from '@/types';
 
@@ -33,9 +33,17 @@ export function useAavePositions(
     setError(null);
 
     try {
-      const userData = await getMultipleUsersAccountData(addresses);
+      const [userData, detailedPositions] = await Promise.all([
+        getMultipleUsersAccountData(addresses),
+        getMultipleDetailedPositions(addresses),
+      ]);
+
+      const detailedByAddress = new Map(
+        detailedPositions.map((p) => [p.address.toLowerCase(), p])
+      );
+
       const formattedPositions = userData.map((data) =>
-        formatAaveUserData(data, ethPrice)
+        formatAaveUserData(data, ethPrice, detailedByAddress.get(data.address.toLowerCase()))
       );
       setPositions(formattedPositions);
       setLastUpdated(new Date());

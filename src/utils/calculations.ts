@@ -1,4 +1,4 @@
-import { AaveUserData, PositionData, LiquidationChartData } from '@/types';
+import { AaveUserData, PositionData, LiquidationChartData, DetailedUserPosition } from '@/types';
 
 // Aave uses 8 decimals for USD values in base currency
 const BASE_CURRENCY_DECIMALS = 8;
@@ -13,7 +13,11 @@ export function toNumber(value: bigint, decimals: number): number {
 }
 
 // Convert Aave raw data to formatted position data
-export function formatAaveUserData(userData: AaveUserData, ethPrice: number): PositionData {
+export function formatAaveUserData(
+  userData: AaveUserData,
+  ethPrice: number,
+  detailedPosition?: DetailedUserPosition
+): PositionData {
   const totalCollateralUSD = toNumber(userData.totalCollateralBase, BASE_CURRENCY_DECIMALS);
   const totalDebtUSD = toNumber(userData.totalDebtBase, BASE_CURRENCY_DECIMALS);
   const healthFactor = toNumber(userData.healthFactor, HEALTH_FACTOR_DECIMALS);
@@ -21,14 +25,54 @@ export function formatAaveUserData(userData: AaveUserData, ethPrice: number): Po
   const ltv = toNumber(userData.ltv, PERCENTAGE_DECIMALS) * 100;
 
   // Calculate estimated liquidation price
-  // This is a simplified calculation assuming all collateral is ETH
-  // Liquidation occurs when: collateralValue * liquidationThreshold = debtValue
-  // So: ethPrice * ethAmount * threshold = debtValue
-  // Liquidation price = debtValue / (ethAmount * threshold)
-  // ethAmount = collateralValue / currentEthPrice
+  // If detailed positions are available, estimate using ETH-correlated assets only.
+  // Otherwise, fall back to simplified "all collateral is ETH" approach.
   let estimatedLiquidationPrice: number | null = null;
+  let ethCorrelatedCollateralUSD: number | undefined;
+  let ethCorrelatedDebtUSD: number | undefined;
+  let nonEthDebtUSD: number | undefined;
+  let ethWeightedCollateralUSD: number | undefined;
+  let nonEthWeightedCollateralUSD: number | undefined;
 
-  if (totalCollateralUSD > 0 && totalDebtUSD > 0 && liquidationThreshold > 0) {
+  if (detailedPosition && detailedPosition.assets.length > 0) {
+    ethCorrelatedCollateralUSD = 0;
+    ethCorrelatedDebtUSD = 0;
+    nonEthDebtUSD = 0;
+    ethWeightedCollateralUSD = 0;
+    nonEthWeightedCollateralUSD = 0;
+
+    for (const asset of detailedPosition.assets) {
+      const weightedCollateral = asset.collateralUSD * (asset.liquidationThreshold / 100);
+      const isEthCorrelated = asset.category === 'eth-correlated';
+
+      if (isEthCorrelated) {
+        ethCorrelatedCollateralUSD += asset.collateralUSD;
+        ethCorrelatedDebtUSD += asset.debtUSD;
+        ethWeightedCollateralUSD += weightedCollateral;
+      } else {
+        nonEthDebtUSD += asset.debtUSD;
+        nonEthWeightedCollateralUSD += weightedCollateral;
+      }
+    }
+
+    // Solve for ETH price multiplier x where HF = 1:
+    // (nonEthWeighted + ethWeighted * x) = (nonEthDebt + ethDebt * x)
+    // x = (nonEthDebt - nonEthWeighted) / (ethWeighted - ethDebt)
+    const numerator = nonEthDebtUSD - nonEthWeightedCollateralUSD;
+    const denominator = ethWeightedCollateralUSD - ethCorrelatedDebtUSD;
+
+    if (denominator > 0 && numerator > 0) {
+      const priceMultiplier = numerator / denominator;
+      if (priceMultiplier > 0 && priceMultiplier < 1 && isFinite(priceMultiplier)) {
+        estimatedLiquidationPrice = ethPrice * priceMultiplier;
+      }
+    }
+  } else if (totalCollateralUSD > 0 && totalDebtUSD > 0 && liquidationThreshold > 0) {
+    // Simplified calculation assuming all collateral is ETH
+    // Liquidation occurs when: collateralValue * liquidationThreshold = debtValue
+    // So: ethPrice * ethAmount * threshold = debtValue
+    // Liquidation price = debtValue / (ethAmount * threshold)
+    // ethAmount = collateralValue / currentEthPrice
     const ethAmount = totalCollateralUSD / ethPrice;
     estimatedLiquidationPrice = totalDebtUSD / (ethAmount * (liquidationThreshold / 100));
   }
@@ -42,6 +86,13 @@ export function formatAaveUserData(userData: AaveUserData, ethPrice: number): Po
     ltv,
     estimatedLiquidationPrice,
     isAtRisk: healthFactor < 1.5 && healthFactor > 0,
+    ethCorrelatedCollateralUSD,
+    ethCorrelatedDebtUSD,
+    nonEthDebtUSD,
+    ethWeightedCollateralUSD,
+    nonEthWeightedCollateralUSD,
+    stableCollateralUSD: detailedPosition?.stableCollateralUSD,
+    assets: detailedPosition?.assets,
   };
 }
 
